@@ -6,11 +6,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.xiaobai.demo.entity.Subject;
+import com.xiaobai.demo.http.HttpResultFunc;
 import com.xiaobai.demo.http.MovieService;
 import com.xiaobai.demo.http.Test;
 import com.xiaobai.demo.http.subscribers.ProgressSubscriber;
 import com.xiaobai.demo.http.subscribers.SubscriberOnNextListener;
 import com.xiaobai.demo.http.utils.RetrofitUtils;
+import com.xiaobai.demo.utils.RxUtils;
 
 import java.util.List;
 
@@ -61,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
     //进行网络请求
     private void getMovie(){
         
-        new Test(RetrofitUtils.createApi(MovieService.class)).getTopMovie(new ProgressSubscriber(getTopMovieOnNext, MainActivity.this), 0, 10);
+//        new Test(RetrofitUtils.createApi(MovieService.class))
+//                .getTopMovie(new ProgressSubscriber(getTopMovieOnNext, MainActivity.this), 0, 10);
+//
+        RetrofitUtils.createApi(MovieService.class).getTopMovie(0,10)
+                .map(new HttpResultFunc<List<Subject>>())
+                .compose(RxUtils.<List<Subject>>applyAsySchedulers())
+                .subscribe(new ProgressSubscriber<List<Subject>>(getTopMovieOnNext,MainActivity.this));
     }
 }
